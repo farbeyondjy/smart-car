@@ -1,1 +1,60 @@
 xxx
+#include <IRremote.h>
+int RECV_PIN = 3;   //红外线接收器OUTPUT端接在pin 10
+IRrecv irrecv(RECV_PIN);  //定义IRrecv对象来接收红外线信号
+decode_results results;   //解码结果放在decode_results构造的对象results里
+double analogVotage;  //模拟电压值
+unsigned int dutyCycleleft1=0;  //占空比
+unsigned int dutyCycleleft2=0;  //占空比
+unsigned int dutyCycleright1=0;  //占空比
+unsigned int dutyCycleright2=0;  //占空比
+void setup() 
+{
+  Serial.begin(9600);      //设置串口波特率
+  analogReference(DEFAULT);  //调用板载5.0V基准源
+  irrecv.enableIRIn(); // 启动红外解码
+  pinMode(5,OUTPUT);
+  pinMode(11,OUTPUT);
+  pinMode(6,OUTPUT);
+  pinMode(10,OUTPUT);
+}
+void loop() 
+{
+  if (irrecv.decode(&results)) //解码成功，收到一组红外线信号
+  {      
+    Serial.println(results.value, HEX);//// 输出红外线解码结果（十六进制）
+    if(results.value==50174055)   // 超级 加速 ！！!  前进！！！
+    {
+       digitalWrite(5,HIGH);
+        digitalWrite(6,HIGH);
+        digitalWrite(10,HIGH);
+        digitalWrite(11,HIGH);
+    }
+    if(results.value==50182215)   // stop！！！
+    {
+       digitalWrite(5,LOW);
+        digitalWrite(6,LOW);
+        digitalWrite(10,LOW);
+        digitalWrite(11,LOW);
+    }
+    if(results.value==50160285)    // 左
+    {
+           digitalWrite(5,HIGH);
+        digitalWrite(6,HIGH);
+        digitalWrite(10,LOW);
+        digitalWrite(11,LOW);
+    }
+    if(results.value==50192925)    // 右
+    {
+        digitalWrite(5,LOW);
+        digitalWrite(6,LOW);
+        digitalWrite(10,HIGH);
+        digitalWrite(11,HIGH);
+    }
+    irrecv.resume(); //  接收下一个值
+  }
+    delay(100);  //等待0.1秒，控制刷新速度
+} 
+
+
+
